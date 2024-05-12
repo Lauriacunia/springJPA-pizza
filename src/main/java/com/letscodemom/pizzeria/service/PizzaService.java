@@ -1,6 +1,8 @@
 package com.letscodemom.pizzeria.service;
 
 import com.letscodemom.pizzeria.persistence.repository.PizzaPageAndSortingRepository;
+import com.letscodemom.pizzeria.service.dto.UpdatePizzaPriceDto;
+import com.letscodemom.pizzeria.service.exception.EmailApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.letscodemom.pizzeria.persistence.entity.PizzaEntity;
 import com.letscodemom.pizzeria.persistence.repository.PizzaRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -101,6 +105,20 @@ public class PizzaService {
 
     public boolean exists (int idPizza) {
         return this.pizzaRepository.existsById(idPizza);
+    }
+
+    @Transactional(noRollbackFor = EmailApiException.class,
+    propagation = Propagation.REQUIRES_NEW
+    ) // si quiero que NO se haga rollback en caso de error particular
+    public void updatePrice(UpdatePizzaPriceDto updatePizzaPriceDto) {
+        this.pizzaRepository.updatePrice(updatePizzaPriceDto);
+        // @Transactional hace que si hay un error en el metodo, se haga un rollback del update
+       // this.sendEmail();
+    }
+
+    private void sendEmail() {
+        // forzamos el error para probar
+        throw new EmailApiException("Error al enviar email");
     }
 
 }

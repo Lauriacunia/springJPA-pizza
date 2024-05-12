@@ -2,6 +2,7 @@ package com.letscodemom.pizzeria.controller;
 
 import java.util.List;
 
+import com.letscodemom.pizzeria.service.dto.UpdatePizzaPriceDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -95,5 +96,15 @@ public class PizzaController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();  // Optional: Return Bad Request if needed
+    }
+
+    @PutMapping("/price")
+    public ResponseEntity<Void> updatePizzaPrice(@RequestBody UpdatePizzaPriceDto updatePizzaPriceDto) {
+        System.out.println(updatePizzaPriceDto.getPizzaId());
+        if(!this.pizzaService.exists(updatePizzaPriceDto.getPizzaId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        this.pizzaService.updatePrice(updatePizzaPriceDto);
+        return ResponseEntity.ok().build();
     }
 }
